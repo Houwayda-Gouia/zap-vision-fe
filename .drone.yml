@@ -105,7 +105,7 @@ steps:
           outputs.helm_release_repo = req('DRONE_RELEASE_REPO_DEV');
           outputs.helm_values_section_name = 'dev';
 
-          outputs.acr_name = req('ACR_USERNAME_DEV') + '.' + req('DRONE_REGISTRY_DOMAIN');
+          outputs.acr_name = req('DRONE_REGISTRY_DOMAIN') + '.' + req('ACR_USERNAME_DEV') ;
           outputs.acr_username = req('ACR_USERNAME_DEV');
           outputs.acr_password = req('ACR_PASSWORD_DEV');
           outputs.acr_domain = req('DRONE_REGISTRY_DOMAIN');
