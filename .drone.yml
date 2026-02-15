@@ -108,6 +108,7 @@ steps:
           outputs.acr_name = req('ACR_USERNAME_DEV') + '.' + req('DRONE_REGISTRY_DOMAIN');
           outputs.acr_username = req('ACR_USERNAME_DEV');
           outputs.acr_password = req('ACR_PASSWORD_DEV');
+          outputs.acr_domain = req('DRONE_REGISTRY_DOMAIN');
 
           outputs.docker_tag = outputs.acr_name + '/' + req('DRONE_IMAGE_NAME') + ':' + req('DRONE_COMMIT_SHA');
           outputs.helm_tag = req('DRONE_COMMIT_SHA');
@@ -175,7 +176,7 @@ steps:
       cat <<EOF > /kaniko/.docker/config.json
       {
         "auths": {
-          "$acr_name": {
+          "$acr_domain": {
             "username": "$acr_username",
             "password": "$acr_password"
           }
