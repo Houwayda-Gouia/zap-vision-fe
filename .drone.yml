@@ -240,6 +240,8 @@ steps:
 
         git clone "https://x-access-token:$DEPLOYMENT_TOKEN@github.com/$helm_release_repo.git" repo
         cd repo
+        ls 
+        pwd
 
         VALUES_FILE="$helm_folder/values.yaml"
         echo "Using VALUES_FILE=$VALUES_FILE"
