@@ -251,7 +251,9 @@ steps:
         grep -nE '^[[:space:]]*tag:' "$VALUES_FILE" || true
 
         # Update only the FIRST 'tag:' occurrence (safe)
-        sed -i "0,/^[[:space:]]*tag:/s//tag: $helm_tag/" "$VALUES_FILE"
+        # sed -i "0,/^[[:space:]]*tag:/s//tag: $helm_tag/" "$VALUES_FILE"
+        sed -i "0,/^[[:space:]]*tag:/s/^\([[:space:]]*\)tag:.*/\1tag: $helm_tag/" "$VALUES_FILE"
+
 
         echo "== AFTER (tag lines) =="
         grep -nE '^[[:space:]]*tag:' "$VALUES_FILE" || true
