@@ -177,7 +177,7 @@ steps:
       cat <<EOF > /kaniko/.docker/config.json
       {
         "auths": {
-          "docker.io": {
+          "https://index.docker.io/v1/": {
             "username": "$acr_username",
             "password": "$acr_password"
           }
