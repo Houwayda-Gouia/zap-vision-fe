@@ -243,7 +243,7 @@ steps:
         ls 
         pwd
 
-        VALUES_FILE="zap-vision/values.yaml"
+        VALUES_FILE="$helm_folder/values.yaml"
         echo "Using VALUES_FILE=$VALUES_FILE"
         test -f "$VALUES_FILE" || (echo "values.yaml not found" && exit 1)
 
