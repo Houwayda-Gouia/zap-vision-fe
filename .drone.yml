@@ -241,7 +241,6 @@ steps:
         git clone "https://x-access-token:$DEPLOYMENT_TOKEN@github.com/$helm_release_repo.git" repo
         cd repo
 
-        # VALUES_FILE="$helm_folder/$APPS_DIR/values.yaml"
         VALUES_FILE="$helm_folder/values.yaml"
         echo "Using VALUES_FILE=$VALUES_FILE"
         test -f "$VALUES_FILE" || (echo "values.yaml not found" && exit 1)
