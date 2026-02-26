@@ -220,7 +220,8 @@ steps:
     # - sed -i "/$helm_values_section_name:/,/tag:/s/\(tag:\).*/\1 $helm_tag/" values.yaml
     # - sed -i "s/\($helm_values_section_name:.*tag:\).*/\1 $helm_tag/" values.yaml
     - pwd 
-    - yq -i ".${helm_values_section_name}.image.tag = \"$helm_tag\"" values.yaml
+    # - yq -i ".${helm_values_section_name}.image.tag = \"$helm_tag\"" values.yaml
+    - yq -i ".frontend.image.tag = \"$helm_tag\"" values.yaml
     # Commit & push
     - git add values.yaml
     - git commit -m "Deploy to $environment - $docker_tag" || echo "No changes to commit"
