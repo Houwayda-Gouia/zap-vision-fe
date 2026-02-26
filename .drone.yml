@@ -186,6 +186,33 @@ steps:
       EOF
     - /kaniko/executor --context . --dockerfile Dockerfile --destination "$docker_tag"
 
+ # Helm Release Update
+- name: helm-release
+  image: alpine:3.19
+ 
+  environment:
+    GITHUBTOKEN:
+      from_secret: DEPLOYMENT_TOKEN
+  commands:
+    
+    - export $(cat .outputs | xargs)
+
+    # Clone helm release repository
+    - git clone https://$GITHUBTOKEN@github.com/$helm_release_repo.git helm-release
+    - cd helm-release/$helm_folder
+
+    # Configure Git identity
+    - git config user.name "Houwayda-Gouia"
+    - git config user.email "houwaydagouiaa@gmail.com"
+
+    # Update values.yaml tag inside correct section
+    - sed -i "/$helm_values_section_name:/,/tag:/s/\(tag:\).*/\1 $helm_tag/" values.yaml
+
+    # Commit & push
+    - git add values.yaml
+    - git commit -m "Deploy to $environment - $docker_tag" || echo "No changes to commit"
+    - git push 
+
 # REQUEST DEPLOYMENT APPROVAL (TAGS ONLY)
 # - name: deployment-approval
 #   image: python:3.11
@@ -209,59 +236,59 @@ steps:
 
 # Helm Release (update values.yaml tag) - working
 # Helm Release (update values.yaml tag) - robust
-- name: helm-release
-  image: alpine:3.20
-  environment:
-    DEPLOYMENT_TOKEN:
-      from_secret: DEPLOYMENT_TOKEN
-  commands:
-    - apk add --no-cache git sed
-    - export $(cat .outputs | xargs)
-    - |-
-        set -e
+# - name: helm-release
+#   image: alpine:3.20
+#   environment:
+#     DEPLOYMENT_TOKEN:
+#       from_secret: DEPLOYMENT_TOKEN
+#   commands:
+#     - apk add --no-cache git sed
+#     - export $(cat .outputs | xargs)
+#     - |-
+#         set -e
 
-        echo "helm_release_repo=$helm_release_repo"
-        echo "helm_folder=$helm_folder"
-        echo "environment=$environment"
-        echo "helm_tag=$helm_tag"
+#         echo "helm_release_repo=$helm_release_repo"
+#         echo "helm_folder=$helm_folder"
+#         echo "environment=$environment"
+#         echo "helm_tag=$helm_tag"
 
-        if [ "$environment" = "development" ]; then
-          APPS_DIR="dev-apps"
-        elif [ "$environment" = "staging" ]; then
-          APPS_DIR="stg-apps"
-        elif [ "$environment" = "production" ]; then
-          APPS_DIR="prd-apps"
-        else
-          echo "Unknown environment: $environment"
-          exit 1
-        fi
+#         if [ "$environment" = "development" ]; then
+#           APPS_DIR="dev-apps"
+#         elif [ "$environment" = "staging" ]; then
+#           APPS_DIR="stg-apps"
+#         elif [ "$environment" = "production" ]; then
+#           APPS_DIR="prd-apps"
+#         else
+#           echo "Unknown environment: $environment"
+#           exit 1
+#         fi
 
-        echo "APPS_DIR=$APPS_DIR"
+#         echo "APPS_DIR=$APPS_DIR"
 
-        git clone "https://x-access-token:$DEPLOYMENT_TOKEN@github.com/$helm_release_repo.git" repo
-        cd repo
-        ls 
-        pwd
+#         git clone "https://x-access-token:$DEPLOYMENT_TOKEN@github.com/$helm_release_repo.git" repo
+#         cd repo
+#         ls 
+#         pwd
 
-        VALUES_FILE="$helm_folder/values.yaml"
-        echo "Using VALUES_FILE=$VALUES_FILE"
-        test -f "$VALUES_FILE" || (echo "values.yaml not found" && exit 1)
+#         VALUES_FILE="$helm_folder/values.yaml"
+#         echo "Using VALUES_FILE=$VALUES_FILE"
+#         test -f "$VALUES_FILE" || (echo "values.yaml not found" && exit 1)
 
-        echo "== BEFORE (tag lines) =="
-        grep -nE '^[[:space:]]*tag:' "$VALUES_FILE" || true
+#         echo "== BEFORE (tag lines) =="
+#         grep -nE '^[[:space:]]*tag:' "$VALUES_FILE" || true
 
-        # Update only the FIRST 'tag:' occurrence (safe)
-        # sed -i "0,/^[[:space:]]*tag:/s//tag: $helm_tag/" "$VALUES_FILE"
-        sed -i "0,/^[[:space:]]*tag:/s/^\([[:space:]]*\)tag:.*/\1tag: $helm_tag/" "$VALUES_FILE"
+#         # Update only the FIRST 'tag:' occurrence (safe)
+#         # sed -i "0,/^[[:space:]]*tag:/s//tag: $helm_tag/" "$VALUES_FILE"
+#         sed -i "0,/^[[:space:]]*tag:/s/^\([[:space:]]*\)tag:.*/\1tag: $helm_tag/" "$VALUES_FILE"
 
 
-        echo "== AFTER (tag lines) =="
-        grep -nE '^[[:space:]]*tag:' "$VALUES_FILE" || true
+#         echo "== AFTER (tag lines) =="
+#         grep -nE '^[[:space:]]*tag:' "$VALUES_FILE" || true
 
-        git diff -- "$VALUES_FILE" || true
-        git add "$VALUES_FILE"
-        git commit -m "Release $environment $docker_tag" || echo "Nothing to commit"
-        git push
+#         git diff -- "$VALUES_FILE" || true
+#         git add "$VALUES_FILE"
+#         git commit -m "Release $environment $docker_tag" || echo "Nothing to commit"
+#         git push
 
 # Kustomize Release
 # - name: kustomize-release
