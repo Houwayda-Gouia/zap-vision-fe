@@ -204,9 +204,11 @@ steps:
     # Configure Git identity
     - git config user.name "Houwayda-Gouia"
     - git config user.email "houwaydagouiaa@gmail.com"
+    
 
     # Update values.yaml tag inside correct section
-    - sed -i "/$helm_values_section_name:/,/tag:/s/\(tag:\).*/\1 $helm_tag/" values.yaml
+    # - sed -i "/$helm_values_section_name:/,/tag:/s/\(tag:\).*/\1 $helm_tag/" values.yaml
+    - sed -i "s/\($helm_values_section_name:.*tag:\).*/\1 $helm_tag/" values.yaml
 
     # Commit & push
     - git add values.yaml
