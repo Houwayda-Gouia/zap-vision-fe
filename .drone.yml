@@ -188,7 +188,7 @@ steps:
 
  # Helm Release Update
 - name: helm-release
-  image: alpine:3.19
+  image: alpine:3.20
  
   environment:
     GITHUBTOKEN:
