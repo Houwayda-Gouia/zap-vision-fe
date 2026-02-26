@@ -222,10 +222,10 @@ steps:
     - pwd 
     # - yq -i ".${helm_values_section_name}.image.tag = \"$helm_tag\"" values.yaml
     # - yq -i "(.[] | select(has(\"$helm_values_section_name\")) | .image.tag) = \"$helm_tag\"" values.yaml
-    - yq -i ".${helm_values_section_name}.image.tag = \"$helm_tag\"" values.yaml
+    # - yq -i ".${helm_values_section_name}.image.tag = \"$helm_tag\"" values.yaml
 
    
-    # - sed -i "/^$helm_values_section_name:/,/tag:/ s/\(tag:\).*/\1 $helm_tag/" values.yaml
+    - sed -i "/^$helm_values_section_name:/,/tag:/ s/\(tag:\).*/\1 $helm_tag/" values.yaml
     # - sed -i "/^[[:space:]]*$helm_values_section_name:/,/^[[:space:]]*[a-zA-Z0-9_]/ s/^\([[:space:]]*tag:\).*/\1 $helm_tag/" values.yaml
     # Commit & push
     - git add values.yaml
