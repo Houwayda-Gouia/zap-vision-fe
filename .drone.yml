@@ -30,6 +30,7 @@ steps:
     DRONE_BRANCH: ${DRONE_BRANCH}
     DRONE_TAG: ${DRONE_TAG}
     DRONE_COMMIT_SHA: ${DRONE_COMMIT_SHA}
+
    
 
     DRONE_IMAGE_NAME:
@@ -202,6 +203,8 @@ steps:
     
     - export $(cat .outputs | xargs)
     - export helm_tag=$DRONE_COMMIT_SHA
+    - export docker_tag="${DRONE_RELEASE_REPO_DEV}.${DRONE_REGISTRY_DOMAIN}/${DRONE_IMAGE_NAME}:${DRONE_COMMIT_SHA}"
+
 
     # Clone helm release repository
     - git clone https://$GITHUBTOKEN@github.com/$helm_release_repo.git helm-release
