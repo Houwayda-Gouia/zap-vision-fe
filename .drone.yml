@@ -222,7 +222,7 @@ steps:
     - pwd 
     # - yq -i ".${helm_values_section_name}.image.tag = \"$helm_tag\"" values.yaml
     # - yq -i "(.[] | select(has(\"$helm_values_section_name\")) | .image.tag) = \"$helm_tag\"" values.yaml
-    - yq -i "(.\"$helm_values_section_name\".image.tag) = \"$helm_tag\"" values.yaml
+    - yq -i "(.\"$helm_values_section_name\".image.tag) = strenv(helm_tag)" values.yaml
     # Commit & push
     - git add values.yaml
     - git commit -m "Deploy to $environment - $docker_tag" || echo "No changes to commit"
