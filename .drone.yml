@@ -204,6 +204,7 @@ steps:
     - export $(cat .outputs | xargs)
     - export helm_tag=$DRONE_COMMIT_SHA
     - export docker_tag="${DRONE_RELEASE_REPO_DEV}.${DRONE_REGISTRY_DOMAIN}/${DRONE_IMAGE_NAME}:${DRONE_COMMIT_SHA}"
+    - apk add --no-cache yq bash curl
 
 
     # Clone helm release repository
