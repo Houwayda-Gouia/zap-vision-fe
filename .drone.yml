@@ -30,6 +30,7 @@ steps:
     DRONE_BRANCH: ${DRONE_BRANCH}
     DRONE_TAG: ${DRONE_TAG}
     DRONE_COMMIT_SHA: ${DRONE_COMMIT_SHA}
+    
 
    
 
@@ -198,36 +199,14 @@ steps:
     GITHUBTOKEN:
       from_secret: DEPLOYMENT_TOKEN
       
-
-  commands:
-    
+  commands:    
     - export $(cat .outputs | xargs)
     - export helm_tag=$DRONE_COMMIT_SHA
-    - export docker_tag="${DRONE_RELEASE_REPO_DEV}.${DRONE_REGISTRY_DOMAIN}/${DRONE_IMAGE_NAME}:${DRONE_COMMIT_SHA}"
-    - apk add --no-cache yq bash curl
-
-
-    # Clone helm release repository
     - git clone https://$GITHUBTOKEN@github.com/$helm_release_repo.git helm-release
     - cd helm-release/$helm_folder
-
-    # Configure Git identity
     - git config user.name "Houwayda-Gouia"
     - git config user.email "houwaydagouiaa@gmail.com"
-    
-
-    # Update values.yaml tag inside correct section
-    # - sed -i "/$helm_values_section_name:/,/tag:/s/\(tag:\).*/\1 $helm_tag/" values.yaml
-    # - sed -i "s/\($helm_values_section_name:.*tag:\).*/\1 $helm_tag/" values.yaml
-    - pwd 
-    # - yq -i ".${helm_values_section_name}.image.tag = \"$helm_tag\"" values.yaml
-    # - yq -i "(.[] | select(has(\"$helm_values_section_name\")) | .image.tag) = \"$helm_tag\"" values.yaml
-    # - yq -i ".${helm_values_section_name}.image.tag = \"$helm_tag\"" values.yaml
-
-   
     - sed -i "/^$helm_values_section_name:/,/tag:/ s/\(tag:\).*/\1 $helm_tag/" values.yaml
-    # - sed -i "/^[[:space:]]*$helm_values_section_name:/,/^[[:space:]]*[a-zA-Z0-9_]/ s/^\([[:space:]]*tag:\).*/\1 $helm_tag/" values.yaml
-    # Commit & push
     - git add values.yaml
     - git commit -m "Deploy to $environment - $docker_tag" || echo "No changes to commit"
     - git push 
