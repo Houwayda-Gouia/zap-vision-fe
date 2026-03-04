@@ -35,20 +35,37 @@ steps:
 #         --disableOssIndex \
 #         --enableExperimental || true
 
+# - name: dependency-check
+#   image: owasp/dependency-check:latest
+#   commands:
+#     - mkdir -p reports
+#     - /usr/share/dependency-check/bin/dependency-check.sh \
+#         --project "$DRONE_REPO" \
+#         --scan /drone/src \
+#         --format HTML \
+#         --out reports \
+#         --disableOssIndex \
+#         --enableExperimental || true
+#     - echo "Report generated:"
+#     - ls -la reports/
+
 - name: dependency-check
   image: owasp/dependency-check:latest
   commands:
-    - mkdir -p reports
+    - pwd
+    - ls -la
+    - mkdir -p /drone/src/reports
     - /usr/share/dependency-check/bin/dependency-check.sh \
         --project "$DRONE_REPO" \
         --scan /drone/src \
         --format HTML \
-        --out reports \
+        --out /drone/src/reports \
         --disableOssIndex \
         --enableExperimental || true
-    - echo "Report generated:"
-    - ls -la reports/
-
+    - echo "Listing /drone/src:"
+    - ls -la /drone/src
+    - echo "Listing reports folder:"
+    - ls -la /drone/src/reports
 # Set environment (DEV / STG / PRD) -> writes .outputs
 - name: set-env
   image: node:18
