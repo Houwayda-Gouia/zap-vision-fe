@@ -24,14 +24,16 @@ steps:
 #     - sonar-scanner
 
 - name: dependency-check
-  image: owasp/dependency-check
+  image: owasp/dependency-check:latest
   commands:
-    - dependency-check.sh \
+    - mkdir -p reports
+    - /usr/share/dependency-check/bin/dependency-check.sh \
         --project "$DRONE_REPO" \
-        --scan . \
+        --scan /drone/src \
         --format HTML \
-        --out ./reports \
-        --disableOssIndex
+        --out reports \
+        --disableOssIndex \
+        --enableExperimental || true
 
 # Set environment (DEV / STG / PRD) -> writes .outputs
 - name: set-env
