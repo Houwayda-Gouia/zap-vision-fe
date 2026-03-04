@@ -23,6 +23,16 @@ steps:
 #   commands:
 #     - sonar-scanner
 
+- name: dependency-check
+  image: owasp/dependency-check
+  commands:
+    - dependency-check.sh \
+        --project "$DRONE_REPO" \
+        --scan . \
+        --format HTML \
+        --out ./reports \
+        --disableOssIndex
+
 # Set environment (DEV / STG / PRD) -> writes .outputs
 - name: set-env
   image: node:18
