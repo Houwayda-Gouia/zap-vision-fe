@@ -81,18 +81,36 @@ steps:
 #     - echo "Listing reports:"
 #     - ls -la reports
 
+# - name: odc-scan
+#   image: owasp/dependency-check:latest
+#   commands:
+#     - mkdir -p reports
+#     - |
+#       /usr/share/dependency-check/bin/dependency-check.sh \
+#         --project "$DRONE_REPO" \
+#         --scan /drone/src \
+#         --format HTML \
+#         --out reports \
+#         --disableOssIndex \
+#         --enableExperimental || true
+#     - echo "Dependency-Check report generated:"
+#     - ls -la reports
+
 - name: odc-scan
   image: owasp/dependency-check:latest
   commands:
     - mkdir -p reports
+    - mkdir -p /cache/dependency-check
     - |
       /usr/share/dependency-check/bin/dependency-check.sh \
         --project "$DRONE_REPO" \
         --scan /drone/src \
         --format HTML \
         --out reports \
+        --data /cache/dependency-check \
         --disableOssIndex \
-        --enableExperimental || true
+        --enableExperimental \
+        --noupdate || true
     - echo "Dependency-Check report generated:"
     - ls -la reports
 # Set environment (DEV / STG / PRD) -> writes .outputs
