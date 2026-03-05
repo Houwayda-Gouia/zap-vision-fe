@@ -162,10 +162,12 @@ steps:
   environment:
     DEPLOYMENT_TOKEN:
       from_secret: DEPLOYMENT_TOKEN
+    DEPLOY2:
+      from_secret: deploy2
   commands:
     - test -f reports/dependency-check-report.html || (echo "ODC report not found" && exit 1)
     - export REPORT_NAME="dependency-check-${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}.html"
-    - git clone https://x-access-token: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@github.com/Houwayda-Gouia/documentations.git docs-repo
+    - git clone https://x-access-token:$DEPLOY2/Houwayda-Gouia/documentations.git docs-repo
     - mkdir -p docs-repo/odc-reports
     - cp reports/dependency-check-report.html "docs-repo/odc-reports/$REPORT_NAME"
     - cd docs-repo
