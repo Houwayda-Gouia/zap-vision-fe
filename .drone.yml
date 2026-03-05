@@ -155,6 +155,7 @@ steps:
     - /usr/share/dependency-check/bin/dependency-check.sh --project "$DRONE_REPO" --scan /drone/src --format HTML --out reports --disableOssIndex --enableExperimental --noupdate || true
 
     - ls -la reports
+    - cat reports/dependency-check-report.html
  
  
  
