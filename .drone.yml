@@ -235,13 +235,14 @@ steps:
     - wget -O trivy-html.tpl https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/html.tpl
     - export $(cat .outputs | xargs)
     - export REPORT_FILE="reports/trivy-report-${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}.html"
-    - trivy image --format template \
+    - |-
+      trivy image --format template \
         --template "@trivy-html.tpl" \
         --output "$REPORT_FILE" \
         --severity CRITICAL,HIGH \
         --ignore-unfixed \
         "$docker_tag"
-    - echo "Generated report: $REPORT_FILE"
+    - 'echo "Generated report: $REPORT_FILE"'
     - ls -lah reports/
  # Helm Release Update
 - name: helm-release
