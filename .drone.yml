@@ -26,38 +26,38 @@ steps:
 
 
 
-- name: odc-scan
+# - name: odc-scan
 
-  image: owasp/dependency-check-action:latest
+#   image: owasp/dependency-check-action:latest
 
-  commands:
+#   commands:
 
-    - mkdir -p reports
+#     - mkdir -p reports
 
-    - /usr/share/dependency-check/bin/dependency-check.sh --project "$DRONE_REPO" --scan /drone/src --format HTML --out reports --disableOssIndex --enableExperimental --noupdate || true
+#     - /usr/share/dependency-check/bin/dependency-check.sh --project "$DRONE_REPO" --scan /drone/src --format HTML --out reports --disableOssIndex --enableExperimental --noupdate || true
 
-    - ls -la reports
-    - cat reports/dependency-check-report.html
+#     - ls -la reports
+#     - cat reports/dependency-check-report.html
 
-- name: publish-odc-report-to-github
-  image: alpine/git
-  environment:
-    DEPLOYMENT_TOKEN:
-      from_secret: DEPLOYMENT_TOKEN
-    DEPLOY2:
-      from_secret: deploy2
-  commands:
-    - test -f reports/dependency-check-report.html || (echo "ODC report not found" && exit 1)
-    - export REPORT_NAME="dependency-check-${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}.html"
-    - git clone https://x-access-token:$DEPLOY2@github.com/Houwayda-Gouia/documentations.git docs-repo
-    - mkdir -p docs-repo/odc-reports
-    - cp reports/dependency-check-report.html "docs-repo/odc-reports/$REPORT_NAME"
-    - cd docs-repo
-    - git config user.name "Houwayda-Gouia"
-    - git config user.email "houwaydagouiaa@gmail.com"
-    - git add odc-reports/
-    - git commit -m "Add ODC report for $DRONE_REPO@$DRONE_COMMIT_SHA" || echo "No changes to commit"
-    - git push
+# - name: publish-odc-report-to-github
+#   image: alpine/git
+#   environment:
+#     DEPLOYMENT_TOKEN:
+#       from_secret: DEPLOYMENT_TOKEN
+#     DEPLOY2:
+#       from_secret: deploy2
+#   commands:
+#     - test -f reports/dependency-check-report.html || (echo "ODC report not found" && exit 1)
+#     - export REPORT_NAME="dependency-check-${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}.html"
+#     - git clone https://x-access-token:$DEPLOY2@github.com/Houwayda-Gouia/documentations.git docs-repo
+#     - mkdir -p docs-repo/odc-reports
+#     - cp reports/dependency-check-report.html "docs-repo/odc-reports/$REPORT_NAME"
+#     - cd docs-repo
+#     - git config user.name "Houwayda-Gouia"
+#     - git config user.email "houwaydagouiaa@gmail.com"
+#     - git add odc-reports/
+#     - git commit -m "Add ODC report for $DRONE_REPO@$DRONE_COMMIT_SHA" || echo "No changes to commit"
+#     - git push
  
  
  
