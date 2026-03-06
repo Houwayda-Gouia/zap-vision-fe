@@ -244,6 +244,25 @@ steps:
         "$docker_tag"
     - 'echo "Generated report: $REPORT_FILE"'
     - ls -lah reports/
+
+- name: publish-trivy-report-to-github
+  image: alpine/git
+  environment:
+    DEPLOY2:
+      from_secret: deploy2
+  commands:
+    - test -f "reports/trivy-report-${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}.html" || (echo "Trivy report not found" && exit 1)
+    - export REPORT_NAME="trivy-report-${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}.html"
+    - git clone https://x-access-token:${DEPLOY2}@github.com/Houwayda-Gouia/documentations.git docs-repo
+    - mkdir -p docs-repo/trivy-reports
+    - cp "reports/trivy-report-${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}.html" "docs-repo/trivy-reports/${REPORT_NAME}"
+    - cd docs-repo
+    - git config user.name "Houwayda-Gouia"
+    - git config user.email "houwaydagouiaa@gmail.com"
+    - git remote set-url origin https://x-access-token:${DEPLOY2}@github.com/Houwayda-Gouia/documentations.git
+    - git add trivy-reports/
+    - git commit -m "Add Trivy report for ${DRONE_REPO}@${DRONE_COMMIT_SHA}" || echo "No changes to commit"
+    - git push origin main
  # Helm Release Update
 - name: helm-release
   image: alpine/git
