@@ -251,9 +251,12 @@ steps:
     DEPLOY2:
       from_secret: deploy2
   commands:
+    - test -n "$DEPLOY2" || (echo "DEPLOY2 secret is empty or missing" && exit 1)
     - test -f "reports/trivy-report-${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}.html" || (echo "Trivy report not found" && exit 1)
     - export REPORT_NAME="trivy-report-${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}.html"
-    - git clone https://x-access-token:${DEPLOY2}@github.com/Houwayda-Gouia/documentations.git docs-repo
+    - git clone https://x-access-token:$DEPLOY2@github.com/Houwayda-Gouia/documentations.git docs-repo
+
+    # - git clone https://x-access-token:$DEPLOY2@github.com/Houwayda-Gouia/documentations.git docs-repo
     - mkdir -p docs-repo/trivy-reports
     - cp "reports/trivy-report-${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}.html" "docs-repo/trivy-reports/${REPORT_NAME}"
     - cd docs-repo
