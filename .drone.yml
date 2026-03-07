@@ -4,8 +4,10 @@ name: ci-pipeline
 
 
 trigger:
+  event:
+    - push
   branch:
-    - dev     
+    - dev    
 steps:
 
 # SonarQube
