@@ -5,14 +5,10 @@ name: ci-pipeline
 
 trigger:
   event:
-    - push       # branch pushes
-    - custom     # manual trigger (like workflow_dispatch)
+    - push
+    - custom
   branch:
-    - dev        # triggers pushes to dev branch
-  ref:
-    - 'refs/tags/v*.*.*'             # vX.Y.Z
-    - 'refs/tags/v*.*.*-avaxia*'     # vX.Y.Z-avaxia*
-    - 'refs/tags/v*.*.*-rc*'         # vX.Y.Z-rc*
+    - dev     
 steps:
 
 # SonarQube
