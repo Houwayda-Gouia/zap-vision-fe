@@ -17,3 +17,4 @@ ENTRYPOINT [ "nginx" , "-g" , "daemon off;" ]
 EXPOSE 5173
 
 
+
