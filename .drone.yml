@@ -6,9 +6,9 @@ name: ci-pipeline
 trigger:
   branch:
     - dev
-  # event:
-  #   - push
-  #   - tag
+  event:
+    - push
+    - tag
 
 steps:
 
