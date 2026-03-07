@@ -26,38 +26,38 @@ steps:
 
 
 
-# - name: odc-scan
+- name: odc-scan
 
-#   image: owasp/dependency-check-action:latest
+  image: owasp/dependency-check-action:latest
 
-#   commands:
+  commands:
 
-#     - mkdir -p reports
+    - mkdir -p reports
 
-#     - /usr/share/dependency-check/bin/dependency-check.sh --project "$DRONE_REPO" --scan /drone/src --format HTML --out reports --disableOssIndex --enableExperimental --noupdate || true
+    - /usr/share/dependency-check/bin/dependency-check.sh --project "$DRONE_REPO" --scan /drone/src --format HTML --out reports --disableOssIndex --enableExperimental --noupdate || true
 
-#     - ls -la reports
-#     - cat reports/dependency-check-report.html
+    - ls -la reports
+    - cat reports/dependency-check-report.html
 
-# - name: publish-odc-report-to-github
-#   image: alpine/git
-#   environment:
-#     DEPLOYMENT_TOKEN:
-#       from_secret: DEPLOYMENT_TOKEN
-#     DEPLOY2:
-#       from_secret: deploy2
-#   commands:
-#     - test -f reports/dependency-check-report.html || (echo "ODC report not found" && exit 1)
-#     - export REPORT_NAME="dependency-check-${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}.html"
-#     - git clone https://x-access-token:$DEPLOY2@github.com/Houwayda-Gouia/documentations.git docs-repo
-#     - mkdir -p docs-repo/odc-reports
-#     - cp reports/dependency-check-report.html "docs-repo/odc-reports/$REPORT_NAME"
-#     - cd docs-repo
-#     - git config user.name "Houwayda-Gouia"
-#     - git config user.email "houwaydagouiaa@gmail.com"
-#     - git add odc-reports/
-#     - git commit -m "Add ODC report for $DRONE_REPO@$DRONE_COMMIT_SHA" || echo "No changes to commit"
-#     - git push
+- name: publish-odc-report-to-github
+  image: alpine/git
+  environment:
+    DEPLOYMENT_TOKEN:
+      from_secret: DEPLOYMENT_TOKEN
+    DEPLOY2:
+      from_secret: deploy2
+  commands:
+    - test -f reports/dependency-check-report.html || (echo "ODC report not found" && exit 1)
+    - export REPORT_NAME="dependency-check-${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}.html"
+    - git clone https://x-access-token:$DEPLOY2@github.com/Houwayda-Gouia/documentations.git docs-repo
+    - mkdir -p docs-repo/odc-reports
+    - cp reports/dependency-check-report.html "docs-repo/odc-reports/$REPORT_NAME"
+    - cd docs-repo
+    - git config user.name "Houwayda-Gouia"
+    - git config user.email "houwaydagouiaa@gmail.com"
+    - git add odc-reports/
+    - git commit -m "Add ODC report for $DRONE_REPO@$DRONE_COMMIT_SHA" || echo "No changes to commit"
+    - git push
  
  
  
@@ -207,7 +207,7 @@ steps:
         NODE
 
 
-# Build & Push Docker (Kaniko)
+
 - name: docker-build-push
   image: gcr.io/kaniko-project/executor:debug
   environment:
@@ -255,20 +255,18 @@ steps:
     - test -f "reports/trivy-report-${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}.html" || (echo "Trivy report not found" && exit 1)
     - export REPORT_NAME="trivy-report-${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}.html"
     - git clone https://x-access-token:$DEPLOY2@github.com/Houwayda-Gouia/documentations.git docs-repo
-
-    # - git clone https://x-access-token:$DEPLOY2@github.com/Houwayda-Gouia/documentations.git docs-repo
     - mkdir -p docs-repo/trivy-reports
     - cp "reports/trivy-report-${DRONE_REPO_NAME}-${DRONE_BUILD_NUMBER}.html" "docs-repo/trivy-reports/${REPORT_NAME}"
     - cd docs-repo
     - git config user.name "Houwayda-Gouia"
     - git config user.email "houwaydagouiaa@gmail.com"
-    # - git config user.name "Houwayda-Gouia"
-    # - git config user.email "houwaydagouiaa@gmail.com"
     - git remote set-url origin https://x-access-token:$DEPLOY2@github.com/Houwayda-Gouia/documentations.git
     - git add trivy-reports/
     - git commit -m "Add Trivy report for ${DRONE_REPO}@${DRONE_COMMIT_SHA}" || echo "No changes to commit"
     - git push origin main
- # Helm Release Update
+
+    
+
 - name: helm-release
   image: alpine/git
  
@@ -309,61 +307,9 @@ steps:
 #     - pip install imapclient
 #     - python application-scripts/Pipelines/approval/approval-oneperson.py
 
-# Helm Release (update values.yaml tag) - working
-# Helm Release (update values.yaml tag) - robust
-# - name: helm-release
-#   image: alpine:3.20
-#   environment:
-#     DEPLOYMENT_TOKEN:
-#       from_secret: DEPLOYMENT_TOKEN
-#   commands:
-#     - apk add --no-cache git sed
-#     - export $(cat .outputs | xargs)
-#     - |-
-#         set -e
-
-#         echo "helm_release_repo=$helm_release_repo"
-#         echo "helm_folder=$helm_folder"
-#         echo "environment=$environment"
-#         echo "helm_tag=$helm_tag"
-
-#         if [ "$environment" = "development" ]; then
-#           APPS_DIR="dev-apps"
-#         elif [ "$environment" = "staging" ]; then
-#           APPS_DIR="stg-apps"
-#         elif [ "$environment" = "production" ]; then
-#           APPS_DIR="prd-apps"
-#         else
-#           echo "Unknown environment: $environment"
-#           exit 1
-#         fi
-
-#         echo "APPS_DIR=$APPS_DIR"
-
-#         git clone "https://x-access-token:$DEPLOYMENT_TOKEN@github.com/$helm_release_repo.git" repo
-#         cd repo
-#         ls 
-#         pwd
-
-#         VALUES_FILE="$helm_folder/values.yaml"
-#         echo "Using VALUES_FILE=$VALUES_FILE"
-#         test -f "$VALUES_FILE" || (echo "values.yaml not found" && exit 1)
-
-#         echo "== BEFORE (tag lines) =="
-#         grep -nE '^[[:space:]]*tag:' "$VALUES_FILE" || true
-
-#         # Update only the FIRST 'tag:' occurrence (safe)
-#         # sed -i "0,/^[[:space:]]*tag:/s//tag: $helm_tag/" "$VALUES_FILE"
-#         sed -i "0,/^[[:space:]]*tag:/s/^\([[:space:]]*\)tag:.*/\1tag: $helm_tag/" "$VALUES_FILE"
 
 
-#         echo "== AFTER (tag lines) =="
-#         grep -nE '^[[:space:]]*tag:' "$VALUES_FILE" || true
 
-#         git diff -- "$VALUES_FILE" || true
-#         git add "$VALUES_FILE"
-#         git commit -m "Release $environment $docker_tag" || echo "Nothing to commit"
-#         git push
 
 # Kustomize Release
 # - name: kustomize-release
