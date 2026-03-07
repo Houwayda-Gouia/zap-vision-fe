@@ -1,15 +1,17 @@
-
 kind: pipeline
 type: kubernetes
 name: ci-pipeline
 
 trigger:
-  branch:
-    - dev
   event:
     - push
-    - tag
-
+    - custom     # manual trigger
+  branch:
+    - dev        # for push events
+  ref:
+    - 'refs/tags/v*.*.*'               # matches vX.Y.Z
+    - 'refs/tags/v*.*.*-avaxia*'      # matches vX.Y.Z-avaxia*
+    - 'refs/tags/v*.*.*-rc*'          # matches vX.Y.Z-rc*
 steps:
 
 # SonarQube
