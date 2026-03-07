@@ -4,9 +4,6 @@ name: ci-pipeline
 
 
 trigger:
-  event:
-    - push
-    - custom
   branch:
     - dev     
 steps:
