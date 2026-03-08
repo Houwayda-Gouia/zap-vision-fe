@@ -38,6 +38,31 @@ SonarQube
     - ls -la reports
     - cat reports/dependency-check-report.html
 
+
+- name: check-odc-report
+  image: alpine
+  commands:
+    - test -f ./reports/dependency-check-report.html || (echo "dependency-check report not found" && exit 1)
+    - ls -lah ./reports
+
+- name: upload-report-to-azure
+  image: mcr.microsoft.com/azure-cli:latest
+  environment:
+    AZURE_STORAGE_ACCOUNT:
+      from_secret: AZURE_STORAGE_ACCOUNT_NAME
+    AZURE_STORAGE_KEY:
+      from_secret: AZURE_STORAGE_ACCOUNT_KEY
+    CONTAINER_NAME:
+      from_secret: AZURE_CONTAINER_NAME
+  commands:
+    - export FILE_NAME="$(date +%Y-%m-%d)-${DRONE_REPO_OWNER}-${DRONE_REPO_NAME}-${DRONE_BRANCH}-${DRONE_COMMIT_SHA}.html"
+    - az storage blob upload \
+        --account-name "$AZURE_STORAGE_ACCOUNT" \
+        --account-key "$AZURE_STORAGE_KEY" \
+        --container-name "$CONTAINER_NAME" \
+        --file "./reports/dependency-check-report.html" \
+        --name "$FILE_NAME"
+
     
 - name: set-env
   image: node:18
