@@ -236,6 +236,24 @@ SonarQube
     - 'echo "Generated report: $REPORT_FILE"'
     - ls -lah reports/
 
+- name: upload-zap-report-to-azure
+  image: mcr.microsoft.com/azure-cli:latest
+  environment:
+    AZURE_STORAGE_ACCOUNT_NAME:
+      from_secret: AZURE_STORAGE_ACCOUNT_NAME
+    AZURE_STORAGE_ACCOUNT_KEY:
+      from_secret: AZURE_STORAGE_ACCOUNT_KEY
+    AZURE_STORAGE_CONTAINER_NAME:
+      from_secret: AZURE_CONTAINER_NAME
+  commands:
+    - export blob_name=$(echo "$REPORT_FILE" | sed 's/:/_/g')
+    - az storage blob upload \
+        --account-name "$AZURE_STORAGE_ACCOUNT_NAME" \
+        --account-key "$AZURE_STORAGE_ACCOUNT_KEY" \
+        --container-name "$AZURE_STORAGE_CONTAINER_NAME" \
+        --name "$blob_name" \
+        --file "$REPORT_FILE"
+
     
 - name: helm-release
   image: alpine/git
